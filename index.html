@@ -282,7 +282,7 @@
         }
 
         .moving-right {
-            animation: moveRight 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: moveRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             z-index: 1000 !important;
             position: fixed !important;
             width: var(--original-width) !important;
@@ -291,7 +291,7 @@
         }
 
         .moving-left {
-            animation: moveLeft 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: moveLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
             z-index: 1000 !important;
             position: fixed !important;
             width: var(--original-width) !important;
@@ -631,13 +631,13 @@
                 // 動畫結束後移除克隆元素
                 setTimeout(() => {
                     clone.remove();
-                }, 2000);
+                }, 1000);
             });
 
             setTimeout(() => {
                 moveSelected();
                 state.isAnimating = false;
-            }, 2000);
+            }, 1000);
         }
 
         function moveSelected() {
