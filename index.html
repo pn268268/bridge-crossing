@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渡橋挑戰遊戲</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2d3748;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.6;
+        }
+
+        .game {
+            width: 90vw;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 95vh;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+        }
+
+        .game-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin: 0;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .game-info p {
+            margin: 0;
+            font-size: 0.95em;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+
+
+        .bridge {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            margin: 12px 0;
+            background: linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%);
+            padding: 20px 16px;
+            border-radius: 20px;
+            position: relative;
+            flex: 1;
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.06),
+                0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: visible;
+            min-height: 220px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            gap: 24px;
+            z-index: 1;
+        }
+
+        .bridge::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 25%;
+            right: 25%;
+            height: 12px;
+            background: repeating-linear-gradient(90deg, #8b7355 0px, #8b7355 20px, transparent 20px, transparent 40px);
+            transform: translateY(-50%);
+            opacity: 0.6;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .side {
+            width: 28%;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            padding: 16px 12px;
+            position: relative;
+            z-index: 2;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+            max-width: 280px;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        .side h3 {
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            color: #4a5568;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .side:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .character {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 12px;
+            margin: 2px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9em;
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.2);
+            white-space: nowrap;
+            max-width: calc(100% - 4px);
+            width: calc(100% - 4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 0.025em;
+            box-sizing: border-box;
+        }
+
+        .character::before {
+            content: attr(data-emoji);
+            font-size: 1.1em;
+            margin-right: 3px;
+        }
+
+        .character:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .character.selected {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 15px -3px rgba(72, 187, 120, 0.3);
+        }
+
+        .character.selected:hover {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .torch {
+            display: inline-block;
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            color: white;
+            font-size: 12px;
+            margin-left: 8px;
+            border-radius: 8px;
+            padding: 4px 8px;
+            box-shadow: 0 2px 4px rgba(237, 137, 54, 0.2);
+            font-weight: 500;
+        }
+
+        .controls {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex: 1;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .time-display {
+            font-size: 1.1em;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            color: #2d3748;
+            padding: 16px 24px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 0;
+            min-width: 220px;
+            font-weight: 500;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .time-display small {
+            display: block;
+            margin-top: 4px;
+            opacity: 0.7;
+            font-size: 0.85em;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.2);
+            letter-spacing: 0.025em;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(102, 126, 234, 0.3);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .moving-right {
+            animation: moveRight 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            z-index: 1000 !important;
+            position: fixed !important;
+            width: var(--original-width) !important;
+            max-width: var(--original-width) !important;
+            box-sizing: border-box !important;
+        }
+
+        .moving-left {
+            animation: moveLeft 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            z-index: 1000 !important;
+            position: fixed !important;
+            width: var(--original-width) !important;
+            max-width: var(--original-width) !important;
+            box-sizing: border-box !important;
+        }
+
+        @keyframes moveRight {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateX(calc(var(--move-distance) * 0.5)) translateY(-30px);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateX(var(--move-distance)) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes moveLeft {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateX(calc(var(--move-distance) * 0.5)) translateY(-30px);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateX(var(--move-distance)) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game {
+                padding: 20px;
+                margin: 10px;
+                height: 98vh;
+                gap: 16px;
+            }
+
+            .bridge {
+                min-height: 200px;
+                padding: 24px 16px;
+            }
+
+            .character {
+                padding: 10px 12px;
+                font-size: 0.9em;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 4px;
+            }
+
+            .game-info {
+                font-size: 0.9em;
+                padding: 16px 20px;
+                gap: 12px;
+            }
+
+            .time-display {
+                font-size: 1em;
+                padding: 12px 16px;
+                min-width: 180px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .side {
+                min-width: 120px;
+                max-width: 160px;
+                padding: 12px 8px;
+                gap: 6px;
+            }
+
+            .character {
+                padding: 6px 8px;
+                font-size: 0.8em;
+                max-width: 100%;
+                margin: 1px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game">
+        <h1>渡橋挑戰遊戲</h1>
+
+        <div class="game-info">
+            <p>🎯 目標：在17分鐘內讓所有人安全過橋</p>
+            <p>🚶‍♂️ 規則：最多兩人同時過橋</p>
+            <p>⚡ 提示：過橋時間以最慢的人為準</p>
+        </div>
+
+        <div class="bridge">
+            <div id="startSide" class="side">
+                <h3>起點</h3>
+            </div>
+            <div id="endSide" class="side">
+                <h3>終點</h3>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="time-display">
+                ⏱️ 已用時間：<span id="time">0</span> 分鐘
+                <small>(限時：17分鐘)</small>
+            </div>
+            <div class="action-buttons">
+                <button id="moveButton" onclick="startMove()" disabled>🚶 開始移動</button>
+                <button onclick="cancelSelection()">❌ 取消選擇</button>
+                <button onclick="resetGame()">🔄 重新開始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const people = [{
+                name: "A (1分)",
+                time: 1,
+                emoji: "🏃"
+            },
+            {
+                name: "B (2分)",
+                time: 2,
+                emoji: "🚶"
+            },
+            {
+                name: "C (5分)",
+                time: 5,
+                emoji: "🚶"
+            },
+            {
+                name: "D (10分)",
+                time: 10,
+                emoji: "🚶‍♀️"
+            }
+        ];
+
+        let state = {
+            startSide: [...people],
+            endSide: [],
+            bridgeSide: "start",
+            selected: [],
+            time: 0,
+            isAnimating: false
+        };
+
+        function render() {
+            const startDiv = document.getElementById("startSide");
+            const endDiv = document.getElementById("endSide");
+            const timeDisplay = document.getElementById("time");
+
+            startDiv.innerHTML = "<h3>起點</h3>";
+            endDiv.innerHTML = "<h3>終點</h3>";
+
+            state.startSide.forEach(p => {
+                const btn = createPersonButton(p, "start");
+                startDiv.appendChild(btn);
+            });
+            state.endSide.forEach(p => {
+                const btn = createPersonButton(p, "end");
+                endDiv.appendChild(btn);
+            });
+
+            timeDisplay.textContent = state.time;
+
+            // 更新選中狀態
+            document.querySelectorAll('.character').forEach(btn => {
+                btn.classList.remove('selected');
+                const personName = btn.getAttribute('data-name');
+                if (state.selected.some(p => p.name === personName)) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function createPersonButton(person, side) {
+            const btn = document.createElement("button");
+            btn.textContent = person.name;
+            btn.className = "character";
+            btn.setAttribute('data-name', person.name);
+            btn.setAttribute('data-emoji', person.emoji);
+
+            btn.onclick = () => {
+                if (!state.isAnimating) {
+                    selectPerson(person, side);
+                }
+            };
+
+            return btn;
+        }
+
+        function selectPerson(person, side) {
+            const currentSide = side === "start" ? state.startSide : state.endSide;
+            const correctSide = (side === "start" && state.bridgeSide === "start") ||
+                (side === "end" && state.bridgeSide === "end");
+
+            if (!correctSide) {
+                showMessage("請從正確的一側選擇角色！");
+                return;
+            }
+
+            if (!state.selected.includes(person)) {
+                if (state.selected.length < 2) {
+                    state.selected.push(person);
+                } else {
+                    showMessage("最多只能選擇兩個人！");
+                    return;
+                }
+            } else {
+                state.selected = state.selected.filter(p => p !== person);
+            }
+
+            render();
+
+            updateMoveButton();
+        }
+
+        function showMessage(msg) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = msg;
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.top = '30px';
+            messageDiv.style.left = '50%';
+            messageDiv.style.transform = 'translateX(-50%)';
+            messageDiv.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+            messageDiv.style.color = 'white';
+            messageDiv.style.padding = '18px 28px';
+            messageDiv.style.borderRadius = '16px';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.fontWeight = '600';
+            messageDiv.style.boxShadow = '0 20px 40px -10px rgba(255, 107, 107, 0.3), 0 8px 16px -4px rgba(238, 90, 36, 0.2)';
+            messageDiv.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+            messageDiv.style.fontSize = '16px';
+            messageDiv.style.letterSpacing = '0.025em';
+            messageDiv.style.backdropFilter = 'blur(10px)';
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateX(-50%) translateY(-10px)';
+            messageDiv.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            document.body.appendChild(messageDiv);
+
+            // 淡入動畫
+            setTimeout(() => {
+                messageDiv.style.opacity = '1';
+                messageDiv.style.transform = 'translateX(-50%) translateY(0)';
+            }, 10);
+
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateX(-50%) translateY(-10px)';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 2500);
+        }
+
+
+
+        function animateMove(selectedPeople) {
+            if (state.isAnimating) return;
+
+            state.isAnimating = true;
+            const fromSideId = state.bridgeSide === "start" ? "startSide" : "endSide";
+            const toSideId = state.bridgeSide === "start" ? "endSide" : "startSide";
+            const fromDiv = document.getElementById(fromSideId);
+            const toDiv = document.getElementById(toSideId);
+            const buttons = Array.from(fromDiv.querySelectorAll("button"));
+            const toAnimate = buttons.filter(btn =>
+                selectedPeople.some(p => btn.getAttribute('data-name') === p.name)
+            );
+
+
+
+            // 計算移動距離
+            const fromRect = fromDiv.getBoundingClientRect();
+            const toRect = toDiv.getBoundingClientRect();
+            const moveDistance = toRect.left - fromRect.left;
+
+            // 根據移動方向選擇動畫類
+            const animationClass = state.bridgeSide === "start" ? "moving-right" : "moving-left";
+
+            // 創建動畫元素的副本並移到 body 層級
+            toAnimate.forEach(btn => {
+                const clone = btn.cloneNode(true);
+                const btnRect = btn.getBoundingClientRect();
+                
+                // 設定克隆元素的樣式
+                clone.style.position = 'fixed';
+                clone.style.left = btnRect.left + 'px';
+                clone.style.top = btnRect.top + 'px';
+                clone.style.width = btnRect.width + 'px';
+                clone.style.height = btnRect.height + 'px';
+                clone.style.zIndex = '1000';
+                clone.style.pointerEvents = 'none';
+                clone.style.margin = '0';
+                clone.style.maxWidth = btnRect.width + 'px';
+                clone.style.setProperty('--original-width', btnRect.width + 'px');
+                document.body.appendChild(clone);
+                
+                // 隱藏原始按鈕
+                btn.style.opacity = '0';
+                
+                // 添加動畫類
+                clone.classList.add(animationClass);
+                clone.style.setProperty('--move-distance', `${moveDistance}px`);
+                
+                // 動畫結束後移除克隆元素
+                setTimeout(() => {
+                    clone.remove();
+                }, 2000);
+            });
+
+            setTimeout(() => {
+                moveSelected();
+                state.isAnimating = false;
+            }, 2000);
+        }
+
+        function moveSelected() {
+            if (state.selected.length === 0 || state.selected.length > 2) return;
+
+            const fromSide = state.bridgeSide === "start" ? state.startSide : state.endSide;
+            const toSide = state.bridgeSide === "start" ? state.endSide : state.startSide;
+
+            for (const person of state.selected) {
+                const idx = fromSide.indexOf(person);
+                if (idx !== -1) {
+                    fromSide.splice(idx, 1);
+                    toSide.push(person);
+                }
+            }
+
+            const crossingTime = Math.max(...state.selected.map(p => p.time));
+            state.time += crossingTime;
+            state.bridgeSide = state.bridgeSide === "start" ? "end" : "start";
+            state.selected = [];
+
+            render();
+            checkWin();
+        }
+
+        function checkWin() {
+            if (state.endSide.length === 4) {
+                if (state.time <= 17) {
+                    showMessage(`🎉 恭喜過關！總耗時：${state.time}分鐘`);
+                } else {
+                    showMessage(`❌ 失敗了，超過時限！總耗時：${state.time}分鐘`);
+                }
+            }
+        }
+
+        function updateMoveButton() {
+            const moveButton = document.getElementById('moveButton');
+            const canMove = state.selected.length >= 1 && state.selected.length <= 2;
+
+            moveButton.disabled = !canMove || state.isAnimating;
+
+            if (canMove) {
+                const crossingTime = Math.max(...state.selected.map(p => p.time));
+                showMessage(`預計耗時：${crossingTime}分鐘`);
+            }
+        }
+
+        function startMove() {
+            if (state.selected.length === 0 || state.selected.length > 2) return;
+            if (state.isAnimating) return;
+
+            animateMove(state.selected);
+        }
+
+        function cancelSelection() {
+            state.selected = [];
+            render();
+            updateMoveButton();
+            showMessage("已取消選擇");
+        }
+
+        function resetGame() {
+            state = {
+                startSide: [...people],
+                endSide: [],
+                bridgeSide: "start",
+                selected: [],
+                time: 0,
+                isAnimating: false
+            };
+            render();
+            updateMoveButton();
+            showMessage("遊戲已重置！");
+        }
+
+        render();
+        updateMoveButton();
+    </script>
+</body>
+
+</html>
