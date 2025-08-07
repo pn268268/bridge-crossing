@@ -142,6 +142,26 @@
             color: #4a5568;
             font-weight: 600;
             opacity: 0.9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .side.active h3 {
+            color: #48bb78;
+            font-weight: 700;
+        }
+
+        .side.active {
+            border-color: rgba(72, 187, 120, 0.6);
+            background: rgba(72, 187, 120, 0.05);
+            box-shadow: 0 8px 25px -5px rgba(72, 187, 120, 0.2);
+        }
+
+        .side.inactive {
+            opacity: 0.6;
+            border-color: rgba(0, 0, 0, 0.1);
         }
 
         .side:hover {
@@ -248,6 +268,8 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
+
 
         .time-display small {
             display: block;
@@ -475,8 +497,18 @@
             const endDiv = document.getElementById("endSide");
             const timeDisplay = document.getElementById("time");
 
-            startDiv.innerHTML = "<h3>起點</h3>";
-            endDiv.innerHTML = "<h3>終點</h3>";
+            // 更新側邊標題和狀態
+            if (state.bridgeSide === "start") {
+                startDiv.innerHTML = "<h3>🎯 起點</h3>";
+                endDiv.innerHTML = "<h3>終點</h3>";
+                startDiv.className = "side active";
+                endDiv.className = "side inactive";
+            } else {
+                startDiv.innerHTML = "<h3>起點</h3>";
+                endDiv.innerHTML = "<h3>🎯 終點</h3>";
+                startDiv.className = "side inactive";
+                endDiv.className = "side active";
+            }
 
             state.startSide.forEach(p => {
                 const btn = createPersonButton(p, "start");
